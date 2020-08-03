@@ -10,9 +10,9 @@ if [[ -z $USER_GID ]]; then
 fi
 
 if [[ "$1" = 'flask' ]]; then
-    echo "Run Flask CLI; User: $USER_UID, Command: $@"
+    echo "Run Flask CLI; User: $(id -u), Command: $@"
 
-    if [[ "$USER_UID" = '0' ]]; then
+    if [[ "$(id -u)" = '0' ]]; then
         chown -R $USER_UID:$USER_GID /home/user
         usermod -u $USER_UID user
         groupmod -g $USER_GID user
