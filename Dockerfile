@@ -12,6 +12,9 @@ ENV TIMEOUT 3000
 
 EXPOSE 5000
 
+VOLUME /app
+WORKDIR /app
+
 RUN set -x \
     && groupadd -g 1000 user \
     && useradd -u 1000 -g user -s /bin/bash -m user

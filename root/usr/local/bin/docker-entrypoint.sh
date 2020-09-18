@@ -13,7 +13,7 @@ if [[ "$1" = 'flask' ]]; then
     echo "Run Flask CLI; User: $(id -u), Command: $@"
 
     if [[ "$(id -u)" = '0' ]]; then
-        chown -R $USER_UID:$USER_GID /home/user
+        chown -R $USER_UID:$USER_GID /home/user /app
         usermod -u $USER_UID user
         groupmod -g $USER_GID user
 
