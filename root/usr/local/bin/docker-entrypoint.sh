@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
+commandExists()
+{
+    if ! command -v $1 &> /dev/null; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+
 if [[ -z $USER_UID ]]; then
     USER_UID=$(id -u)
 fi
@@ -18,7 +28,11 @@ if [[ "$1" = 'flask' ]]; then
         groupmod -g $USER_GID user
 
 		# then restart script as user
-		exec gosu user "$BASH_SOURCE" "$@"
+        if commandExists "gosu"; then
+            exec gosu user "$BASH_SOURCE" "$@"
+        else
+            exec su-exec user "$BASH_SOURCE" "$@"
+        fi
 	fi
 
     if [[ "$2" = 'run' ]]; then

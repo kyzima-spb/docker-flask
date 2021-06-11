@@ -3,19 +3,19 @@ set -Eeuo pipefail
 
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
-	versions=( [0-9].[0-9]/ )
+    versions=( [0-9].[0-9]/ )
 fi
 versions=( "${versions[@]%/}" )
 
 
 generated_warning() {
-    cat <<-EOH
-		#
-		# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
-		#
-		# PLEASE DO NOT EDIT IT DIRECTLY.
-		#
-	EOH
+cat <<-EOH
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+EOH
 }
 
 for version in "${versions[@]}"; do
