@@ -1,7 +1,11 @@
+## Attention
+
+Use the image as a base to create your image.
+
+
 ## Volumes
 
 * `/app` - application directory; is the current working directory.
-* `/python_packages` -
 
 
 ## Run in daemon mode
@@ -42,9 +46,9 @@ docker run --rm -ti --name flask_1 \
 
 ## Environment Variables
 
-* `FLASK_APP` - is the name of the module to import at `flask run`;
-* `FLASK_ENV` - is used to indicate to Flask, extensions, and other programs, what context Flask is running in;
-* `USER_UID` - user ID from which the application is running;
-* `USER_GID` - group ID for the user from which the application is running;
+* `FLASK_APP` - is the name of the module to import at `flask run` (Defaults no set);
+* `FLASK_ENV` - is used to indicate to Flask, extensions, and other programs, what context Flask is running in (Defaults to `production`);
+* `USER_UID` - user ID from which the application is running (Defaults to `1000`);
+* `USER_GID` - group ID for the user from which the application is running (Defaults to `1000`);
 * `WORKER_CLASS` - is the name of the worker class (only `gevent` is supported);
-* `TIMEOUT` - workers silent for more than this many seconds are killed and restarted (only production mode).
+* `TIMEOUT` - workers silent for more than this many seconds are killed and restarted (only production mode, defaults to `3000`).
