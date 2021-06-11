@@ -3,7 +3,7 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM python:3.9-buster-slim
+FROM python:3.9-slim-buster
 
 LABEL maintainer="Kirill Vercetti <office@kyzima-spb.com>"
 

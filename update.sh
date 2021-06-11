@@ -19,7 +19,7 @@ for version in "${versions[@]}"; do
         distr="$(basename "$base")"
         
         case "$base" in
-            *slim) template="slim"; tag="$(dirname "$base")-slim" ;;
+            *slim) template="slim"; tag="slim-$(dirname "$base")" ;;
             alpine*) template="alpine"; tag="${base}" ;;
             *) template="debian"; tag="$distr" ;;
         esac
