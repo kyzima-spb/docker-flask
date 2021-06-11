@@ -24,11 +24,11 @@ if [[ "$1" = 'flask' ]]; then
     if [[ "$2" = 'run' ]]; then
         case "$FLASK_ENV" in
             'development')
-                flask run --host=0.0.0.0
+                exec flask run --host=0.0.0.0
                 ;;
             'production')
                 envsubst < /gunicorn_config.tmpl > $HOME/gunicorn_config.py
-                gunicorn -c $HOME/gunicorn_config.py $FLASK_APP
+                exec gunicorn -c $HOME/gunicorn_config.py $FLASK_APP
                 ;;
             *)
                 echo "Unknow environment $FLASK_ENV" >&2
