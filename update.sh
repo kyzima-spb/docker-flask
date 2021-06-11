@@ -37,7 +37,7 @@ for version in "${versions[@]}"; do
         { generated_warning; cat "$template"; } > "$dest/Dockerfile"
 
         sed -ri \
-            -e 's/^(FROM python):.*/\1:'"$version-$tag"'/' \
+            -e 's/^(FROM python):%%PLACEHOLDER%%/\1:'"$version-$tag"'/' \
     		"$dest/Dockerfile"
     done
 done

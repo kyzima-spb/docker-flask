@@ -3,7 +3,7 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM python:3.8-alpine3.12
+FROM python:3.8-alpine3.12 as build
 
 RUN apk update
 RUN apk add --no-cache build-base libffi-dev
