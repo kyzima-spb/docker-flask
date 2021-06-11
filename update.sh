@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
 
 versions=( "$@" )
+if [ ${#versions[@]} -eq 0 ]; then
+	versions=( [0-9].[0-9]/ )
+fi
+versions=( "${versions[@]%/}" )
 
 
 generated_warning() {
