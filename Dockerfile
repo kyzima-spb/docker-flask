@@ -2,6 +2,8 @@ FROM python:3.8-slim
 
 LABEL maintainer="Kirill Vercetti <office@kyzima-spb.com>"
 
+STOPSIGNAL SIGINT
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV PYTHONPATH "/python_packages"
 ENV USER_UID 1000
@@ -24,7 +26,11 @@ RUN apt update
 RUN set -x \
     && apt install -yq --no-install-recommends gettext-base gosu \
     && apt-get clean  \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && pip install --no-cache-dir --disable-pip-version-check -q \
+           flask \
+           gunicorn \
+           gevent
 
 ADD ./root /
 ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin
