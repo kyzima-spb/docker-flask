@@ -31,6 +31,7 @@ jobs:
         with:
           files: "./${{ matrix.version }}/${{ matrix.base }}/Dockerfile"
   build:
+    runs-on: ubuntu-latest
     if: prepare.steps.check_files.outputs.files_exists == 'true'
     needs: [ prepare ]
     steps:
