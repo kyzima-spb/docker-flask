@@ -41,6 +41,9 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
+      - name: Fix bug lsb_release
+        run: rm /usr/bin/lsb_release
+      
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
