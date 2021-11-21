@@ -3,7 +3,7 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM python:3.8-alpine3.12 as build
+FROM python:3.10-alpine3.14 as build
 
 RUN apk update
 RUN apk add --no-cache build-base libffi-dev
@@ -13,7 +13,7 @@ RUN mkdir /wheels \
     && pip wheel flask gunicorn gevent --wheel-dir=/wheels
 
 
-FROM python:3.8-alpine3.12
+FROM python:3.10-alpine3.14
 
 LABEL maintainer="Kirill Vercetti <office@kyzima-spb.com>"
 
@@ -22,6 +22,7 @@ STOPSIGNAL SIGINT
 ENV PYTHONPATH "/python_packages"
 ENV USER_UID 1000
 ENV USER_GID 1000
+ENV FLASK_APP app:app
 ENV FLASK_ENV production
 ENV WORKER_CLASS gevent
 ENV TIMEOUT 3000

@@ -3,22 +3,28 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM python:3.8-alpine3.13 as build
+FROM python:3.10-buster as build
 
-RUN apk update
-RUN apk add --no-cache build-base libffi-dev
+ENV DEBIAN_FRONTEND noninteractive
 
-RUN mkdir /wheels \
+RUN apt update
+
+RUN set -x \
+    && apt install -yq --no-install-recommends gcc libffi-dev build-essential
+
+RUN set -x \
+    && mkdir /wheels \
     && pip install --no-cache-dir --disable-pip-version-check wheel \
     && pip wheel flask gunicorn gevent --wheel-dir=/wheels
 
 
-FROM python:3.8-alpine3.13
+FROM python:3.10-buster
 
 LABEL maintainer="Kirill Vercetti <office@kyzima-spb.com>"
 
 STOPSIGNAL SIGINT
 
+ENV DEBIAN_FRONTEND noninteractive
 ENV PYTHONPATH "/python_packages"
 ENV USER_UID 1000
 ENV USER_GID 1000
@@ -33,23 +39,25 @@ VOLUME /app
 WORKDIR /app
 
 RUN set -x \
-    && addgroup -g 1000 user \
-    && adduser -u 1000 -G user -s /bin/sh -D user
+    && groupadd -g 1000 user \
+    && useradd -u 1000 -g user -s /bin/bash -m user
 
-RUN apk update
+RUN apt update
 
 COPY --from=build /wheels /wheels
 
 RUN set -x \
-    && apk add --no-cache bash shadow gettext su-exec \
+    && apt install -yq --no-install-recommends gettext-base gosu \
+    && apt-get clean  \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && pip install \
-       --no-index \
-       --find-links=/wheels \
-       --no-cache-dir \
-       --disable-pip-version-check \
-           flask \
-           gunicorn \
-           gevent
+           --no-index \
+           --find-links=/wheels \
+           --no-cache-dir \
+           --disable-pip-version-check \
+               flask \
+               gunicorn \
+               gevent
 
 ADD ./root /
 ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin

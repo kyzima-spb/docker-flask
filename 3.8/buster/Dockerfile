@@ -3,6 +3,21 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
+FROM python:3.8-buster as build
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt update
+
+RUN set -x \
+    && apt install -yq --no-install-recommends gcc libffi-dev build-essential
+
+RUN set -x \
+    && mkdir /wheels \
+    && pip install --no-cache-dir --disable-pip-version-check wheel \
+    && pip wheel flask gunicorn gevent --wheel-dir=/wheels
+
+
 FROM python:3.8-buster
 
 LABEL maintainer="Kirill Vercetti <office@kyzima-spb.com>"
@@ -13,6 +28,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV PYTHONPATH "/python_packages"
 ENV USER_UID 1000
 ENV USER_GID 1000
+ENV FLASK_APP app:app
 ENV FLASK_ENV production
 ENV WORKER_CLASS gevent
 ENV TIMEOUT 3000
@@ -28,14 +44,20 @@ RUN set -x \
 
 RUN apt update
 
+COPY --from=build /wheels /wheels
+
 RUN set -x \
     && apt install -yq --no-install-recommends gettext-base gosu \
     && apt-get clean  \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && pip install --no-cache-dir --disable-pip-version-check -q \
-           flask \
-           gunicorn \
-           gevent
+    && pip install \
+           --no-index \
+           --find-links=/wheels \
+           --no-cache-dir \
+           --disable-pip-version-check \
+               flask \
+               gunicorn \
+               gevent
 
 ADD ./root /
 ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin
