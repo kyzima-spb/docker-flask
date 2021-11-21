@@ -25,6 +25,9 @@ jobs:
           - "3.8"
     steps:
       -
+        name: Check Out Repo
+        uses: actions/checkout@v2
+      -
         name: Check Dokerfile existence
         id: check_files
         uses: andstor/file-existence-action@v1
