@@ -1,0 +1,18 @@
+name: CI to Docker Hub
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [3.8, 3.9, 3.10]
+        base: [stretch, buster, bullseye, alpine3.13, alpine3.14]
+    steps:
+      -
+        name: Show tag
+        run: echo "${{ matrix.version }}-${{ matrix.base }}"
+    
