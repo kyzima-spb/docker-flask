@@ -42,7 +42,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
       - name: Fix bug lsb_release
-        run: rm /usr/bin/lsb_release
+        run: sudo rm /usr/bin/lsb_release
       
       - name: Build and push
         id: docker_build
