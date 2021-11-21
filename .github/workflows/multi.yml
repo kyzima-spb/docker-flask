@@ -15,9 +15,10 @@ jobs:
           slim-stretch, stretch,
           alpine3.13, alpine3.14
         ]
-        version: ["3.8", "3.9", "3.10"]
+        version: ["3.10", "3.9", "3.8"]
     steps:
       -
         name: Show tag
+        if: hashFiles('./${{ matrix.version }}/${{ matrix.base }}/Dockerfile') != ''
         run: echo "${{ matrix.version }}-${{ matrix.base }}"
     
