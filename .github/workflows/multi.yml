@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,6 +30,10 @@ jobs:
         uses: andstor/file-existence-action@v1
         with:
           files: "./${{ matrix.version }}/${{ matrix.base }}/Dockerfile"
+  build:
+    if: prepare.steps.check_files.outputs.files_exists == 'true'
+    needs: [ prepare ]
+    steps:
       -
         name: Show tag
         if: steps.check_files.outputs.files_exists == 'true'
