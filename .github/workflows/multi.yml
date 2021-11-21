@@ -30,15 +30,16 @@ jobs:
         uses: andstor/file-existence-action@v1
         with:
           files: "./${{ matrix.version }}/${{ matrix.base }}/Dockerfile"
+      -
+        name: Exit
+        if: steps.check_files.outputs.files_exists != 'true'
+        run: exit 1
+  
   build:
     runs-on: ubuntu-latest
-    if: prepare.steps.check_files.outputs.files_exists == 'true'
+    if: ${{ success() }}
     needs: [ prepare ]
     steps:
-      -
-        name: Show tag
-        if: steps.check_files.outputs.files_exists == 'true'
-        run: echo "${{ matrix.version }}-${{ matrix.base }}"
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
