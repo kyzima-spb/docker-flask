@@ -9,8 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        base: [
+          slim-bullseye, bullseye,
+          slim-buster, buster,
+          slim-stretch, stretch,
+          alpine3.13, alpine3.14
+        ]
         version: ["3.8", "3.9", "3.10"]
-        base: [stretch, buster, bullseye, alpine3.13, alpine3.14]
     steps:
       -
         name: Show tag
