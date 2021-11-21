@@ -21,12 +21,12 @@ jobs:
           - "3.9"
           - "3.8"
     steps:
-       -
-         name: Check Dokerfile existence
-         id: check_files
-         uses: andstor/file-existence-action@v1
-         with:
-           files: "${{ matrix.version }}/${{ matrix.base }}/Dockerfile"
+      -
+        name: Check Dokerfile existence
+        id: check_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "${{ matrix.version }}/${{ matrix.base }}/Dockerfile"
       -
         name: Show tag
         if: steps.check_files.outputs.files_exists == 'true'
