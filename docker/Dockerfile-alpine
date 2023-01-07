@@ -1,0 +1,71 @@
+ARG PYVERSION=3.11
+ARG RELEASE=alpine3.17
+
+FROM python:$PYVERSION-$RELEASE as build
+
+RUN set -ex \
+    && apk update \
+    && apk add --no-cache build-base libffi-dev \
+    && pip install \
+        --no-cache-dir \
+        --disable-pip-version-check \
+            wheel \
+    && mkdir /wheels \
+    && pip wheel \
+        --wheel-dir=/wheels \
+            flask \
+            gunicorn \
+            gevent
+
+
+FROM python:$PYVERSION-$RELEASE
+
+LABEL maintainer="Kirill Vercetti <office@kyzima-spb.com>"
+
+STOPSIGNAL SIGINT
+
+EXPOSE 5000
+
+ENV PYTHONPATH "/python_packages"
+ENV USER_UID 1000
+ENV USER_GID 1000
+ENV FLASK_APP app:app
+ENV FLASK_ENV production
+ENV WORKER_CLASS gevent
+ENV TIMEOUT 3000
+
+VOLUME /app
+WORKDIR /app
+
+COPY --from=build /wheels /wheels
+
+RUN set -x \
+    && apk update \
+    && apk add --no-cache \
+        bash \
+        shadow \
+        gettext \
+        su-exec \
+    && pip install \
+        --no-index \
+        --find-links=/wheels \
+        --no-cache-dir \
+        --disable-pip-version-check \
+            flask \
+            gunicorn \
+            gevent \
+    && rm -rf /wheels
+
+RUN set -x \
+    && addgroup -g 1000 user \
+    && adduser -u 1000 -G user -s /bin/sh -D user
+
+ADD ./root /
+ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin
+
+RUN set -ex \
+    && ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh \
+    && chmod +x /usr/local/bin/pydep.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["flask", "run"]
