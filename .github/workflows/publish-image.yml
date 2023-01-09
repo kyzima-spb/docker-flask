@@ -3,7 +3,7 @@ name: Build and publish images
 on:
   push:
     branches:
-      - feature-20
+      - master
 
 env:
   IMAGE_NAME: "flask"
