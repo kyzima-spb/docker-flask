@@ -65,8 +65,8 @@ RUN set -ex \
    && groupadd -g 1000 user \
    && useradd -u 1000 -g user -s /bin/bash -m user
 
-ADD ./root /
 ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin
+ADD ./root /
 
 RUN set -ex \
     && ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh \
