@@ -25,6 +25,7 @@ getPythonPackageVersion()
 
 
 export PYTHON_FLASK_VERSION="$(getPythonPackageVersion "Flask")"
+export GUNICORN_CONFIG_LOCATION="/etc/gunicorn"
 
 if [[ -z $USER_UID ]]; then
     USER_UID=$(id -u)
@@ -46,7 +47,7 @@ if [[ "$1" = 'flask' ]]; then
             groupmod -g "$USER_GID" user
         fi
 
-        chown -R $USER_UID:$USER_GID /home/user /app
+        chown -R $USER_UID:$USER_GID /home/user "$GUNICORN_CONFIG_LOCATION" /app
 
 		    # then restart script as user
         if commandExists "gosu"; then
@@ -81,8 +82,9 @@ if [[ "$1" = 'flask' ]]; then
         if $IS_DEBUG; then
             exec flask run --host=0.0.0.0
         else
-            envsubst < /gunicorn_config.tmpl > $HOME/gunicorn_config.py
-            exec gunicorn -c $HOME/gunicorn_config.py $FLASK_APP
+            export GUNICORN_CONFIG_FILE="$GUNICORN_CONFIG_LOCATION/config.py"
+            envsubst < "$GUNICORN_CONFIG_LOCATION/config.tmpl" > "$GUNICORN_CONFIG_FILE"
+            exec gunicorn -c "$GUNICORN_CONFIG_FILE" "$FLASK_APP"
         fi
     fi
 fi
