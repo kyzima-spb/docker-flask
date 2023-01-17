@@ -30,7 +30,6 @@ ENV PYTHONPATH "/python_packages"
 ENV USER_UID 1000
 ENV USER_GID 1000
 ENV FLASK_APP app:app
-ENV FLASK_ENV production
 ENV WORKER_CLASS gevent
 ENV TIMEOUT 3000
 
@@ -60,8 +59,8 @@ RUN set -x \
     && addgroup -g 1000 user \
     && adduser -u 1000 -G user -s /bin/sh -D user
 
-ADD ./root /
 ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin
+ADD ./root /
 
 RUN set -ex \
     && ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh \

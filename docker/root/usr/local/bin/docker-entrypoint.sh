@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# set -e
 
 commandExists()
 {
@@ -18,6 +17,14 @@ groupExists()
     getent group $1 > /dev/null 2>&1
 }
 
+
+getPythonPackageVersion()
+{
+    pip show "$1" | grep Version | sed -e "s/Version: //"
+}
+
+
+export PYTHON_FLASK_VERSION="$(getPythonPackageVersion "Flask")"
 
 if [[ -z $USER_UID ]]; then
     USER_UID=$(id -u)
@@ -48,21 +55,35 @@ if [[ "$1" = 'flask' ]]; then
             exec su-exec $USER_UID:$USER_GID "$BASH_SOURCE" "$@"
         fi
     fi
-
-    if [[ "$2" = 'run' ]]; then
+    
+    if [[ "$PYTHON_FLASK_VERSION" < '1.0.0' ]]; then
+        echo "Unsupported Flask version $FLASK_VERSION" >&2
+        exit 1
+    elif [[ "$PYTHON_FLASK_VERSION" < '2.2.0' ]]; then
+        FLASK_ENV=${FLASK_ENV:-'production'}
         case "$FLASK_ENV" in
-            'development')
-                exec flask run --host=0.0.0.0
-                ;;
-            'production')
-                envsubst < /gunicorn_config.tmpl > $HOME/gunicorn_config.py
-                exec gunicorn -c $HOME/gunicorn_config.py $FLASK_APP
-                ;;
+            'development') IS_DEBUG=true ;;
+            'production') IS_DEBUG=false ;;
             *)
                 echo "Unknow environment $FLASK_ENV" >&2
                 exit 1
                 ;;
         esac
+    else
+        FLASK_DEBUG=${FLASK_DEBUG:-'0'}
+        case "$FLASK_DEBUG" in
+            '0') IS_DEBUG=false ;;
+            *) IS_DEBUG=true ;;
+        esac
+    fi
+
+    if [[ "$2" = 'run' ]]; then
+        if $IS_DEBUG; then
+            exec flask run --host=0.0.0.0
+        else
+            envsubst < /gunicorn_config.tmpl > $HOME/gunicorn_config.py
+            exec gunicorn -c $HOME/gunicorn_config.py $FLASK_APP
+        fi
     fi
 fi
 

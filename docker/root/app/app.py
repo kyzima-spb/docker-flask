@@ -16,7 +16,7 @@ def pythoninfo():
             'scm_revision': platform.python_revision(),
         },
         'platform': platform,
-        'env': os.environ,
+        'env': sorted(os.environ.items()),
     }
 
 
