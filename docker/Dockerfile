@@ -64,12 +64,10 @@ RUN set -ex \
    && groupadd -g 1000 user \
    && useradd -u 1000 -g user -s /bin/bash -m user
 
-ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin
-ADD ./root /
+ADD https://kyzima-spb.github.io/docker-useful/dockerfile/switch-user.sh /usr/local/bin/
+RUN set -ex && chmod +x /usr/local/bin/*.sh
 
-RUN set -ex \
-    && ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh \
-    && chmod +x /usr/local/bin/pydep.sh
+COPY ./root /
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["flask", "run"]
