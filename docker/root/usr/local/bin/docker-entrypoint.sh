@@ -28,14 +28,19 @@ if [[ "$(id -u)" = '0' ]] && [[ "$USER_UID" != '0' ]]; then
 fi
 
 if [[ "$1" = 'flask' ]]; then
-  if [[ "$PYTHON_FLASK_VERSION" < '1.0.0' ]]; then
-    echo "Unsupported Flask version $FLASK_VERSION" >&2
+  if compver -v1 "$PYTHON_FLASK_VERSION" -op '<' -v2 '0.11'
+  then
+    echo "Unsupported Flask version $PYTHON_FLASK_VERSION" >&2
     exit 1
-  elif [[ "$PYTHON_FLASK_VERSION" < '2.2.0' ]]; then
-    FLASK_ENV=${FLASK_ENV:-'production'}
-    case "$FLASK_ENV" in
-      'development') IS_DEBUG=true ;;
-      'production') IS_DEBUG=false ;;
+  fi
+
+  DEBUG_ENABLE=false
+
+  if compver -v1 "$PYTHON_FLASK_VERSION" -op '<' -v2 '2.2.0'
+  then
+    case "${FLASK_ENV:-production}" in
+      'development') DEBUG_ENABLE=true ;;
+      'production') DEBUG_ENABLE=false ;;
       *)
         echo "Unknown environment $FLASK_ENV" >&2
         exit 1
@@ -43,14 +48,14 @@ if [[ "$1" = 'flask' ]]; then
     esac
   else
     if [[ "${FLASK_DEBUG:-0}" = '0' ]]; then
-      IS_DEBUG=false
+      DEBUG_ENABLE=false
     else
-      IS_DEBUG=true
+      DEBUG_ENABLE=true
     fi
   fi
 
   if [[ "$2" = 'run' ]]; then
-    if $IS_DEBUG; then
+    if $DEBUG_ENABLE; then
       exec flask run --host=0.0.0.0
     else
       export GUNICORN_CONFIG_FILE="$GUNICORN_CONFIG_LOCATION/config.py"

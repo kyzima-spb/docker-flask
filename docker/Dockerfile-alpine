@@ -26,19 +26,18 @@ STOPSIGNAL SIGINT
 
 EXPOSE 5000
 
-ENV PYTHONPATH "/python_packages"
+ENV PYTHONPATH "/python_packages:/app"
 ENV USER_UID 1000
 ENV USER_GID 1000
 ENV FLASK_APP app:app
 ENV WORKER_CLASS gevent
 ENV TIMEOUT 3000
 
-VOLUME /app
 WORKDIR /app
 
 COPY --from=build /wheels /wheels
 
-RUN set -x \
+RUN set -ex \
     && apk update \
     && apk add --no-cache \
         bash \
@@ -59,12 +58,15 @@ RUN set -x \
     && addgroup -g 1000 user \
     && adduser -u 1000 -G user -s /bin/sh -D user
 
-ADD https://kyzima-spb.github.io/src/bash/pydep.sh /usr/local/bin
-ADD ./root /
+ARG USEFUL_URL="https://kyzima-spb.github.io/docker-useful/dockerfile/"
+ADD $USEFUL_URL/compver/compver /usr/local/bin/
+ADD $USEFUL_URL/switch-user.sh /usr/local/bin/
 
 RUN set -ex \
-    && ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh \
-    && chmod +x /usr/local/bin/pydep.sh
+    && chmod +x /usr/local/bin/switch-user.sh \
+                /usr/local/bin/compver
+
+COPY ./root /
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["flask", "run"]
