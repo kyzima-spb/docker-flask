@@ -11,11 +11,7 @@ RUN set -ex \
         --disable-pip-version-check \
             wheel \
     && mkdir /wheels \
-    && pip wheel \
-        --wheel-dir=/wheels \
-            flask \
-            gunicorn \
-            gevent
+    && pip wheel --wheel-dir=/wheels gevent
 
 
 FROM python:$PYVERSION-$RELEASE
@@ -49,9 +45,13 @@ RUN set -ex \
         --find-links=/wheels \
         --no-cache-dir \
         --disable-pip-version-check \
+            gevent \
+    && pip install \
+        --no-cache-dir \
+        --disable-pip-version-check \
             flask \
             gunicorn \
-            gevent \
+            pythoninfo \
     && rm -rf /wheels
 
 RUN set -x \

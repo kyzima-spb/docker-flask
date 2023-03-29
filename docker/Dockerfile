@@ -13,14 +13,9 @@ RUN set -ex \
         build-essential \
     && pip install \
         --no-cache-dir \
-        --disable-pip-version-check \
-            wheel \
+        --disable-pip-version-check wheel \
     && mkdir /wheels \
-    && pip wheel \
-        --wheel-dir=/wheels \
-            flask \
-            gunicorn \
-            gevent
+    && pip wheel --wheel-dir=/wheels gevent
 
 
 FROM python:$PYVERSION-$RELEASE
@@ -53,9 +48,13 @@ RUN set -ex \
         --find-links=/wheels \
         --no-cache-dir \
         --disable-pip-version-check \
-           flask \
-           gunicorn \
-           gevent \
+            gevent \
+    && pip install \
+        --no-cache-dir \
+        --disable-pip-version-check \
+            flask \
+            gunicorn \
+            pythoninfo \
     && apt-get clean  \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /wheels
 
