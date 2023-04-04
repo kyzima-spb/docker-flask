@@ -28,7 +28,7 @@ if [[ "$(id -u)" = '0' ]] && [[ "$USER_UID" != '0' ]]; then
 fi
 
 if [[ "$1" = 'flask' ]]; then
-  if compver -v1 "$PYTHON_FLASK_VERSION" -op '<' -v2 '0.11'
+  if compver.sh "$PYTHON_FLASK_VERSION < 0.11"
   then
     echo "Unsupported Flask version $PYTHON_FLASK_VERSION" >&2
     exit 1
@@ -36,7 +36,7 @@ if [[ "$1" = 'flask' ]]; then
 
   DEBUG_ENABLE=false
 
-  if compver -v1 "$PYTHON_FLASK_VERSION" -op '<' -v2 '2.2.0'
+  if compver.sh "$PYTHON_FLASK_VERSION < 2.2.0"
   then
     case "${FLASK_ENV:-production}" in
       'development') DEBUG_ENABLE=true ;;
