@@ -63,7 +63,7 @@ ADD $USEFUL_URL/compver/compver.sh /usr/local/bin/
 ADD $USEFUL_URL/switch-user/switch-user.sh /usr/local/bin/
 
 RUN set -ex \
-    && chmod 755 /usr/local/bin/*.sh \
+    && chmod 755 /usr/local/bin/*.sh
 
 COPY ./root /
 
