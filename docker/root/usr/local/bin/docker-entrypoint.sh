@@ -7,9 +7,8 @@ getPythonPackageVersion()
 }
 
 
-export PYTHON_FLASK_VERSION
+GUNICORN_CONFIG_LOCATION=${GUNICORN_CONFIG_LOCATION:-'/etc/gunicorn'}
 PYTHON_FLASK_VERSION="$(getPythonPackageVersion "Flask")"
-export GUNICORN_CONFIG_LOCATION="/etc/gunicorn"
 
 if [[ -z $USER_UID ]]; then
   USER_UID=$(id -u)
@@ -38,19 +37,29 @@ if [[ "$1" = 'flask' ]]; then
 
   if compver.sh "$PYTHON_FLASK_VERSION < 2.2.0"
   then
-    case "${FLASK_ENV:-production}" in
-      'development') DEBUG_ENABLE=true ;;
-      'production') DEBUG_ENABLE=false ;;
+    FLASK_ENV=${FLASK_ENV:-'production'}
+    case "$FLASK_ENV" in
+      'development')
+        DEBUG_ENABLE=true
+        export FLASK_ENV
+        ;;
+      'production')
+        DEBUG_ENABLE=false
+        export FLASK_ENV
+        ;;
       *)
         echo "Unknown environment $FLASK_ENV" >&2
         exit 1
         ;;
     esac
   else
-    if [[ "${FLASK_DEBUG:-0}" = '0' ]]; then
+    FLASK_DEBUG=${FLASK_DEBUG:-'0'}
+    if [[ "$FLASK_DEBUG" = '0' ]]; then
       DEBUG_ENABLE=false
+      export FLASK_DEBUG
     else
       DEBUG_ENABLE=true
+      export FLASK_DEBUG
     fi
   fi
 
@@ -58,8 +67,18 @@ if [[ "$1" = 'flask' ]]; then
     if $DEBUG_ENABLE; then
       exec flask run --host=0.0.0.0
     else
-      export GUNICORN_CONFIG_FILE="$GUNICORN_CONFIG_LOCATION/config.py"
-      envsubst < "$GUNICORN_CONFIG_LOCATION/config.tmpl" > "$GUNICORN_CONFIG_FILE"
+      GUNICORN_CONFIG_TEMPLATE="$GUNICORN_CONFIG_LOCATION/config.tmpl"
+      GUNICORN_CONFIG_FILE="$GUNICORN_CONFIG_LOCATION/config.py"
+      GUNICORN_WORKER_CLASS=${GUNICORN_WORKER_CLASS:-'gevent'}
+      GUNICORN_TIMEOUT=${GUNICORN_TIMEOUT:-3000}
+
+      export GUNICORN_CONFIG_LOCATION
+      export GUNICORN_CONFIG_TEMPLATE
+      export GUNICORN_CONFIG_FILE
+      export GUNICORN_WORKER_CLASS
+      export GUNICORN_TIMEOUT
+
+      envsubst < "$GUNICORN_CONFIG_TEMPLATE" > "$GUNICORN_CONFIG_FILE"
       exec gunicorn -c "$GUNICORN_CONFIG_FILE" "$FLASK_APP"
     fi
   fi
