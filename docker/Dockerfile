@@ -62,13 +62,12 @@ RUN set -ex \
    && groupadd -g 1000 user \
    && useradd -u 1000 -g user -s /bin/bash -m user
 
-ARG USEFUL_URL="https://kyzima-spb.github.io/docker-useful/dockerfile/"
-ADD $USEFUL_URL/compver/compver /usr/local/bin/
-ADD $USEFUL_URL/switch-user.sh /usr/local/bin/
+ARG USEFUL_URL="https://kyzima-spb.github.io/docker-useful/"
+ADD $USEFUL_URL/compver/compver.sh /usr/local/bin/
+ADD $USEFUL_URL/switch-user/switch-user.sh /usr/local/bin/
 
 RUN set -ex \
-    && chmod +x /usr/local/bin/switch-user.sh \
-                /usr/local/bin/compver
+    && chmod 755 /usr/local/bin/*.sh
 
 COPY ./root /
 
