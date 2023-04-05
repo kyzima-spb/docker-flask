@@ -1,6 +1,6 @@
 import multiprocessing
 
-bind = '0.0.0.0:5000'
-workers = multiprocessing.cpu_count() * 2 + 1
+bind = '${GUNICORN_HOST}:${GUNICORN_PORT}'
+workers = ${GUNICORN_WORKERS}
 timeout = ${GUNICORN_TIMEOUT}
 worker_class = '${GUNICORN_WORKER_CLASS}'

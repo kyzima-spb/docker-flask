@@ -69,16 +69,15 @@ if [[ "$1" = 'flask' ]]; then
     else
       GUNICORN_CONFIG_TEMPLATE="$GUNICORN_CONFIG_LOCATION/config.tmpl"
       GUNICORN_CONFIG_FILE="$GUNICORN_CONFIG_LOCATION/config.py"
-      GUNICORN_WORKER_CLASS=${GUNICORN_WORKER_CLASS:-'gevent'}
-      GUNICORN_TIMEOUT=${GUNICORN_TIMEOUT:-3000}
 
-      export GUNICORN_CONFIG_LOCATION
-      export GUNICORN_CONFIG_TEMPLATE
-      export GUNICORN_CONFIG_FILE
-      export GUNICORN_WORKER_CLASS
-      export GUNICORN_TIMEOUT
+      if [[ ! -f "$GUNICORN_CONFIG_FILE" ]]; then
+        export GUNICORN_CONFIG_LOCATION
+        export GUNICORN_CONFIG_TEMPLATE
+        export GUNICORN_CONFIG_FILE
+        source "$GUNICORN_CONFIG_LOCATION/variables.sh"
+        envsubst < "$GUNICORN_CONFIG_TEMPLATE" > "$GUNICORN_CONFIG_FILE"
+      fi
 
-      envsubst < "$GUNICORN_CONFIG_TEMPLATE" > "$GUNICORN_CONFIG_FILE"
       exec gunicorn -c "$GUNICORN_CONFIG_FILE" "$FLASK_APP"
     fi
   fi
