@@ -8,6 +8,9 @@
   - [Run in production mode](#run-in-production-mode)
   - [Run in development mode](#run-in-development-mode)
 - [How to change UID/GID?](#how-to-change-uidgid)
+- [Gunicorn configuration](#gunicorn-configuration)
+  - [Method 1: Environment Variables](#method-1--environment-variables)
+  - [Method 2: Configuration file](#method-2--configuration-file)
 
 
 ## How to create an image?
@@ -114,8 +117,8 @@ $ docker run \
       --name flask_app_1 \
       -p 5000:5000 \
       -e FLASK_APP=app:app \
-      -e USER_ID=1001 \
-      -e GROUP_ID=1001 \
+      -e USER_UID=1001 \
+      -e USER_GID=1001 \
       flask_app
 ```
 
@@ -128,8 +131,61 @@ $ docker run \
       --name flask_app_1 \
       -p 5000:5000 \
       -e FLASK_APP=app:app \
-      -e USER_ID=www-data \
-      -e GROUP_ID=www-data \
+      -e USER_UID=www-data \
+      -e USER_GID=www-data \
+      flask_app
+```
+
+
+## Gunicorn configuration
+
+By default, Gunicorn stores configuration files in the `/etc/gunicorn` directory,
+but it can be changed using the `GUNICORN_CONFIG_LOCATION` environment variable.
+
+### Method 1: Environment Variables
+
+Configuration parameter values can be set via environment variables with the `GUNICORN_` prefix in the variable name.
+
+The parameter names are the same as the environment variable names.
+For example, the value of the `timeout` option can be set using the `GUNICORN_TIMEOUT` environment variable.
+
+An exception for the `bind` option, its value is given by two variables: `GUNICORN_HOST` and `GUNICORN_PORT`.
+
+```shell
+$ docker run \
+      --rm \
+      -d \
+      --name flask_app_1 \
+      -p 9000:9000 \
+      -e FLASK_APP=app:app \
+      -e GUNICORN_PORT=9000 \
+      -e GUNICORN_TIMEOUT=5000 \
+      flask_app
+```
+
+So far, a limited number of variables are supported to test this approach.
+
+### Method 2: Configuration file
+
+If you don't like the first method for some reason,
+you can copy the config file into the image:
+
+```dockerfile
+# ...
+COPY ./gunicorn_config.py /etc/gunicorn/config.py
+# ...
+```
+
+Or mount the file to the container at startup:
+
+```shell
+$ docker run \
+      --rm \
+      -d \
+      --name flask_app_1 \
+      -p 5000:5000 \
+      -e FLASK_APP=app:app \
+      -v $(pwd)/gunicorn_config.py:/etc/gunicorn/config.py \
       flask_app
 ```
 
