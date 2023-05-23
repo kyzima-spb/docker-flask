@@ -65,7 +65,16 @@ if [[ "$1" = 'flask' ]]; then
 
   if [[ "$2" = 'run' ]]; then
     if $DEBUG_ENABLE; then
-      exec flask run --host=0.0.0.0
+      args='run --host=0.0.0.0'
+
+      if [[ "${DEV_HTTPS:-0}" = '0' ]]; then
+        export DEV_HTTPS='0'
+      else
+        args+=' --cert=adhoc'
+        export DEV_HTTPS='1'
+      fi
+
+      exec flask $args
     else
       GUNICORN_CONFIG_TEMPLATE="$GUNICORN_CONFIG_LOCATION/config.tmpl"
       GUNICORN_CONFIG_FILE="$GUNICORN_CONFIG_LOCATION/config.py"

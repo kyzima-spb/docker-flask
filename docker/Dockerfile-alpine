@@ -48,6 +48,7 @@ RUN set -ex \
         --no-cache-dir \
         --disable-pip-version-check \
             flask \
+            pyopenssl \
             gunicorn \
             pythoninfo \
     && rm -rf /wheels
