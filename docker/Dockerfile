@@ -1,5 +1,5 @@
 ARG PYVERSION=3.11
-ARG RELEASE=slim-bullseye
+ARG RELEASE=slim-bookworm
 
 FROM python:$PYVERSION-$RELEASE as build
 
