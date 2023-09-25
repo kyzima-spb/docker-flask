@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        release: ["slim-bullseye", "slim-buster", "alpine3.17"]
+        release: ["slim-bookworm", "slim-bullseye", "slim-buster", "alpine3.17"]
         pyversion: ["3.11", "3.10", "3.9", "3.8", "3.7"]
     steps:
       -

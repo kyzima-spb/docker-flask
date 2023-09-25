@@ -51,7 +51,6 @@ RUN set -ex \
         --no-cache-dir \
         --disable-pip-version-check \
             flask \
-            pyopenssl \
             gunicorn \
             pythoninfo \
     && apt-get clean  \
