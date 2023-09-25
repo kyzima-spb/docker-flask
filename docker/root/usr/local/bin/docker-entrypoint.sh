@@ -8,7 +8,7 @@ getPythonPackageVersion()
 
 
 GUNICORN_CONFIG_LOCATION=${GUNICORN_CONFIG_LOCATION:-'/etc/gunicorn'}
-PYTHON_FLASK_VERSION="$(getPythonPackageVersion "Flask")"
+pythonFlaskVersion="$(getPythonPackageVersion "Flask")"
 
 if [[ -z $USER_UID ]]; then
   USER_UID=$(id -u)
@@ -27,24 +27,24 @@ if [[ "$(id -u)" = '0' ]] && [[ "$USER_UID" != '0' ]]; then
 fi
 
 if [[ "$1" = 'flask' ]]; then
-  if compver.sh "$PYTHON_FLASK_VERSION < 0.11"
+  if compver.sh "$pythonFlaskVersion < 0.11"
   then
-    echo "Unsupported Flask version $PYTHON_FLASK_VERSION" >&2
+    echo "Unsupported Flask version $pythonFlaskVersion" >&2
     exit 1
   fi
 
-  DEBUG_ENABLE=false
+  debugEnable=false
 
-  if compver.sh "$PYTHON_FLASK_VERSION < 2.2.0"
+  if compver.sh "$pythonFlaskVersion < 2.2.0"
   then
     FLASK_ENV=${FLASK_ENV:-'production'}
     case "$FLASK_ENV" in
       'development')
-        DEBUG_ENABLE=true
+        debugEnable=true
         export FLASK_ENV
         ;;
       'production')
-        DEBUG_ENABLE=false
+        debugEnable=false
         export FLASK_ENV
         ;;
       *)
@@ -55,16 +55,16 @@ if [[ "$1" = 'flask' ]]; then
   else
     FLASK_DEBUG=${FLASK_DEBUG:-'0'}
     if [[ "$FLASK_DEBUG" = '0' ]]; then
-      DEBUG_ENABLE=false
+      debugEnable=false
       export FLASK_DEBUG
     else
-      DEBUG_ENABLE=true
+      debugEnable=true
       export FLASK_DEBUG
     fi
   fi
 
   if [[ "$2" = 'run' ]]; then
-    if $DEBUG_ENABLE; then
+    if $debugEnable; then
       args='run --host=0.0.0.0'
 
       if [[ "${DEV_HTTPS:-0}" = '0' ]]; then

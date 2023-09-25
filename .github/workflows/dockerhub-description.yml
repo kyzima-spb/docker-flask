@@ -8,6 +8,9 @@ on:
       - README.md
       - .github/workflows/dockerhub-description.yml
 
+env:
+  IMAGE_NAME: "flask"
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -21,5 +24,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-          repository: ${{ secrets.DOCKER_HUB_USERNAME }}/flask
+          repository: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}
           short-description: ${{ github.event.repository.description }}

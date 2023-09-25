@@ -1,5 +1,5 @@
 ARG PYVERSION=3.11
-ARG RELEASE=slim-bullseye
+ARG RELEASE=slim-bookworm
 
 FROM python:$PYVERSION-$RELEASE as build
 
@@ -60,12 +60,8 @@ RUN set -ex \
    && groupadd -g 1000 user \
    && useradd -u 1000 -g user -s /bin/bash -m user
 
-ARG USEFUL_URL="https://kyzima-spb.github.io/docker-useful/"
-ADD $USEFUL_URL/compver/compver.sh /usr/local/bin/
-ADD $USEFUL_URL/switch-user/switch-user.sh /usr/local/bin/
-
-RUN set -ex \
-    && chmod 755 /usr/local/bin/*.sh
+COPY --from=kyzimaspb/useful /apps/compver/compver.sh /usr/local/bin/
+COPY --from=kyzimaspb/useful /apps/switch-user/switch-user.sh /usr/local/bin/
 
 COPY ./root /
 
